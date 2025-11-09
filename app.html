@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>gopHub Frontend</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React + ReactDOM CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+  <!-- Koala CSS CDN 🐨 (exemple fictif pour stylisation) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/koala-css@1.0.0/koala.min.css">
+
+  <!-- Custom CSS -->
+  <style>
+    body {
+      background: #0b0f14;
+      color: #e6e6e6;
+      font-family: 'Koala', sans-serif;
+    }
+    nav button {
+      transition: all 0.2s ease;
+    }
+    nav button:hover {
+      color: #e46b10;
+      transform: scale(1.05);
+    }
+    .card {
+      background: #11161d;
+      border: 1px solid #e46b10;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <nav class="flex items-center justify-between p-4 border-b border-[#e46b10]">
+    <div class="flex gap-4">
+      <span class="font-bold text-[#e46b10]">gopHub 🐨🔥⚡️</span>
+      <button onclick="showPage('dashboard')">Dashboard</button>
+      <button onclick="showPage('packages')">Packages</button>
+      <button onclick="showPage('upload')">Upload</button>
+    </div>
+    <div id="authNav" class="flex gap-4"></div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto p-6 space-y-6">
+    <!-- Dashboard -->
+    <section id="dashboard" class="hidden card">
+      <h1 class="text-2xl font-semibold">Dashboard</h1>
+      <p id="status"></p>
+    </section>
+
+    <!-- Register -->
+    <section id="register" class="hidden card">
+      <h1 class="text-xl">Register</h1>
+      <input id="regEmail" class="w-full p-2 bg-black border" placeholder="email">
+      <input id="regPass" type="password" class="w-full p-2 bg-black border" placeholder="password">
+      <button class="px-4 py-2 border border-[#e46b10]" onclick="register()">Register</button>
+      <p id="regMsg" class="text-[#e46b10]"></p>
+    </section>
+
+    <!-- Verify -->
+    <section id="verify" class="hidden card">
+      <h1 class="text-xl">Verify OTP</h1>
+      <input id="otp" class="w-full p-2 bg-black border" placeholder="OTP">
+      <button class="px-4 py-2 border border-[#e46b10]" onclick="verify()">Verify</button>
+      <p id="verifyMsg" class="text-[#e46b10]"></p>
+    </section>
+
+    <!-- Login -->
+    <section id="login" class="hidden card">
+      <h1 class="text-xl">Login</h1>
+      <input id="logEmail" class="w-full p-2 bg-black border" placeholder="email">
+      <input id="logPass" type="password" class="w-full p-2 bg-black border" placeholder="password">
+      <button class="px-4 py-2 border border-[#e46b10]" onclick="login()">Login</button>
+      <p id="loginMsg" class="text-[#e46b10]"></p>
+    </section>
+
+    <!-- Upload -->
+    <section id="upload" class="hidden card">
+      <h1 class="text-xl">Upload Package</h1>
+      <input id="pkgName" class="w-full p-2 bg-black border" placeholder="package name">
+      <input id="pkgFile" type="file" class="w-full p-2 bg-black border">
+      <button class="px-4 py-2 border border-[#e46b10]" onclick="push()">Push</button>
+      <p id="pushMsg" class="text-[#e46b10]"></p>
+    </section>
+
+    <!-- Packages -->
+    <section id="packages" class="hidden card">
+      <h1 class="text-xl">Packages</h1>
+      <button class="px-4 py-2 border border-[#e46b10]" onclick="list()">Refresh</button>
+      <ul id="pkgList" class="space-y-2"></ul>
+    </section>
+  </main>
+
+<script>
+const API = "https://gophub.onrender.com";
+let token = null;
+let email = null;
+
+function showPage(id) {
+  document.querySelectorAll("section").forEach(s => s.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+}
+
+function updateNav() {
+  const nav = document.getElementById("authNav");
+  nav.innerHTML = token
+    ? `<button onclick="logout()">Logout</button>`
+    : `<button onclick="showPage('login')">Login</button>
+       <button onclick="showPage('register')">Register</button>`;
+}
+
+async function register() {
+  email = document.getElementById("regEmail").value;
+  const password = document.getElementById("regPass").value;
+  const res = await fetch(API+"/register", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({email,password})
+  });
+  const data = await res.json();
+  document.getElementById("regMsg").innerText = JSON.stringify(data);
+  showPage("verify");
+}
+
+async function verify() {
+  const otp = document.getElementById("otp").value;
+  const res = await fetch(API+"/verify", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({email,otp})
+  });
+  const data = await res.json();
+  if(data.token){ token=data.token; updateNav(); showPage("dashboard"); }
+  document.getElementById("verifyMsg").innerText = JSON.stringify(data);
+}
+
+async function login() {
+  email = document.getElementById("logEmail").value;
+  const password = document.getElementById("logPass").value;
+  const res = await fetch(API+"/login", {
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({email,password})
+  });
+  const data = await res.json();
+  if(data.token){ token=data.token; updateNav(); showPage("dashboard"); }
+  document.getElementById("loginMsg").innerText = JSON.stringify(data);
+}
+
+async function push() {
+  const name = document.getElementById("pkgName").value;
+  const file = document.getElementById("pkgFile").files[0];
+  const fd = new FormData();
+  fd.append("name", name);
+  fd.append("file", file);
+  const res = await fetch(API+"/push", {
+    method:"POST", headers:{Authorization:`Bearer ${token}`}, body:fd
+  });
+  const data = await res.json();
+  document.getElementById("pushMsg").innerText = JSON.stringify(data);
+}
+
+async function list() {
+  const res = await fetch(API+"/list");
+  const data = await res.json();
+  const ul = document.getElementById("pkgList");
+  ul.innerHTML = "";
+  data.packages.forEach(p=>{
+    ul.innerHTML += `<li class="flex gap-2">${p}
+      <button onclick="pull('${p}')">Pull</button>
+      <button onclick="del('${p}')">Delete</button>
+    </li>`;
+  });
+}
+
+async function pull(name) {
+  const res = await fetch(API+"/pull/"+name);
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = name+".pkg"; a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function del(name) {
+  const res = await fetch(API+"/delete/"+name, {
+    method:"DELETE", headers:{Authorization:`Bearer ${token}`}
+  });
+  const data = await res.json();
+  alert(JSON.stringify(data));
+  list();
+}
+
+function logout(){ token=null; updateNav(); showPage("login"); }
+
+updateNav();
+showPage("dashboard");
+</script>
+</body>
+</html>
