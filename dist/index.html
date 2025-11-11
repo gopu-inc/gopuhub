@@ -7,17 +7,20 @@
     body { font-family: Arial, sans-serif; margin: 2rem; background: #f9f9f9; }
     h1 { color: #333; }
     .package { border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; background: #fff; }
+    button { margin-right: 1rem; }
     pre { background: #eee; padding: 1rem; overflow-x: auto; }
   </style>
 </head>
 <body>
   <h1>📦 Packages publiés sur gopHub</h1>
-  <div id="packages"></div>
+  <div id="packages">Chargement...</div>
 
   <script>
+    const API = "http://localhost:8000";
+
     async function loadPackages() {
       try {
-        const res = await fetch("http://localhost:8000/list");
+        const res = await fetch(`${API}/list`);
         const data = await res.json();
         const container = document.getElementById("packages");
         container.innerHTML = "";
@@ -30,23 +33,45 @@
             <p>Description: ${pkg.description || "—"}</p>
             <p>Téléchargements: ${pkg.downloads}</p>
             <button onclick="loadReadme('${pkg.name}')">Voir README</button>
+            <button onclick="downloadFile('${pkg.name}','${pkg.name}.gopuTN')">Télécharger manifest</button>
             <div id="readme-${pkg.name}"></div>
           `;
           container.appendChild(div);
         });
       } catch (err) {
         console.error("Erreur API:", err);
+        document.getElementById("packages").innerText = "Erreur de connexion à l'API";
       }
     }
 
     async function loadReadme(name) {
       try {
-        const res = await fetch(`http://localhost:8000/readme/${name}`);
+        const res = await fetch(`${API}/readme/${name}`);
+        if (!res.ok) throw new Error("README introuvable");
         const text = await res.text();
         document.getElementById(`readme-${name}`).innerHTML =
           `<h3>README</h3><pre>${text}</pre>`;
       } catch (err) {
         console.error("Erreur lecture README:", err);
+        document.getElementById(`readme-${name}`).innerText = "README introuvable";
+      }
+    }
+
+    async function downloadFile(name, filename) {
+      try {
+        const res = await fetch(`${API}/pull/${name}/${filename}`);
+        if (!res.ok) throw new Error("Fichier introuvable");
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      } catch (err) {
+        console.error("Erreur téléchargement:", err);
+        alert("Impossible de télécharger le fichier");
       }
     }
 
