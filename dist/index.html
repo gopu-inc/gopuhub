@@ -1,233 +1,936 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>gopHub Frontend</title>
-
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Markdown parser -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-  <!-- Custom CSS -->
-  <style>
-    body {
-      background: #0b0f14;
-      color: #e6e6e6;
-      font-family: sans-serif;
-    }
-    nav button {
-      transition: all 0.2s ease;
-      padding: 0.8rem 1.4rem; /* ✅ boutons plus grands */
-      font-size: 1rem;
-    }
-    nav button:hover {
-      color: #e46b10;
-      transform: scale(1.05);
-    }
-    .card {
-      background: #11161d;
-      border: 1px solid #e46b10;
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
-    }
-    footer {
-      text-align: center;
-      padding: 1rem;
-      border-top: 1px solid #e46b10;
-      margin-top: 2rem;
-      color: #888;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>gopHub 🚀</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6f42c1;
+            --secondary: #6c757d;
+            --success: #198754;
+            --info: #0dcaf0;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--primary) !important;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #6f42c1 0%, #6610f2 100%);
+            color: white;
+            padding: 4rem 0;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 2rem;
+        }
+        
+        .package-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        
+        .package-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .package-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+        }
+        
+        .download-count {
+            background-color: var(--info);
+            color: white;
+            border-radius: 20px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.85rem;
+        }
+        
+        .auth-container {
+            max-width: 500px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding: 2rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: #5a32a3;
+            border-color: #5a32a3;
+        }
+        
+        .file-upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #f8f9fa;
+        }
+        
+        .file-upload-area:hover {
+            border-color: var(--primary);
+            background-color: #e9ecef;
+        }
+        
+        .file-list {
+            margin-top: 1rem;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .readme-content {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .stats-card {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+        
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body>
+    <div id="root"></div>
 
-  <!-- Navigation -->
-  <nav class="flex items-center justify-between p-4 border-b border-[#e46b10]">
-    <div class="flex gap-4">
-      <span class="font-bold text-[#e46b10]">gopHub 🐨🔥⚡️</span>
-      <button onclick="showPage('dashboard')">Dashboard</button>
-      <button onclick="showPage('packages')">Packages</button>
-      <button onclick="showPage('upload')">Upload</button>
-      <button onclick="showPage('markdown')">Markdown</button>
-    </div>
-    <div id="authNav" class="flex gap-4"></div>
-  </nav>
-
-  <!-- Main content -->
-  <main class="flex-grow max-w-3xl mx-auto p-6 space-y-6">
-    <!-- Dashboard -->
-    <section id="dashboard" class="hidden card">
-      <h1 class="text-2xl font-semibold">Dashboard</h1>
-      <p id="status"></p>
-    </section>
-
-    <!-- Register -->
-    <section id="register" class="hidden card">
-      <h1 class="text-xl">Register</h1>
-      <input id="regEmail" class="w-full p-2 bg-black border mb-2" placeholder="email">
-      <input id="regPass" type="password" class="w-full p-2 bg-black border mb-2" placeholder="password">
-      <button class="px-6 py-3 border border-[#e46b10]" onclick="register()">Register</button>
-      <p id="regMsg" class="text-[#e46b10] mt-2"></p>
-    </section>
-
-    <!-- Login -->
-    <section id="login" class="hidden card">
-      <h1 class="text-xl">Login</h1>
-      <input id="logEmail" class="w-full p-2 bg-black border mb-2" placeholder="email">
-      <input id="logPass" type="password" class="w-full p-2 bg-black border mb-2" placeholder="password">
-      <button class="px-6 py-3 border border-[#e46b10]" onclick="login()">Login</button>
-      <p id="loginMsg" class="text-[#e46b10] mt-2"></p>
-    </section>
-
-    <!-- Upload -->
-    <section id="upload" class="hidden card">
-      <h1 class="text-xl">Upload Package</h1>
-      <input id="pkgName" class="w-full p-2 bg-black border mb-2" placeholder="package name">
-      <input id="pkgFile" type="file" class="w-full p-2 bg-black border mb-2">
-      <button class="px-6 py-3 border border-[#e46b10]" onclick="push()">Push</button>
-      <p id="pushMsg" class="text-[#e46b10] mt-2"></p>
-    </section>
-
-    <!-- Packages -->
-    <section id="packages" class="hidden card">
-      <h1 class="text-xl">Packages</h1>
-      <button class="px-6 py-3 border border-[#e46b10]" onclick="list()">Refresh</button>
-      <ul id="pkgList" class="space-y-2 mt-2"></ul>
-    </section>
-
-    <!-- Markdown Page -->
-    <section id="markdown" class="hidden card">
-      <h1 class="text-xl">Markdown Viewer</h1>
-      <textarea id="mdInput" class="w-full p-2 bg-black border mb-2" rows="6" placeholder="Écris ton markdown ici..."></textarea>
-      <button class="px-6 py-3 border border-[#e46b10]" onclick="renderMarkdown()">Render</button>
-      <div id="mdOutput" class="prose prose-invert mt-4"></div>
-    </section>
-  </main>
-
-  <!-- Footer -->
-  <footer>
-    gopu.inc. © 2025
-  </footer>
-
-<script>
-const API = "https://gophub.onrender.com";
-let token = localStorage.getItem("token") || null;
-let email = localStorage.getItem("email") || null;
-
-function showPage(id) {
-  document.querySelectorAll("section").forEach(s => s.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
-}
-
-function updateNav() {
-  const nav = document.getElementById("authNav");
-  nav.innerHTML = token
-    ? `<span class="text-[#e46b10]">${email}</span>
-       <button class="px-6 py-3 border border-[#e46b10]" onclick="logout()">Logout</button>`
-    : `<button class="px-6 py-3 border border-[#e46b10]" onclick="showPage('login')">Login</button>
-       <button class="px-6 py-3 border border-[#e46b10]" onclick="showPage('register')">Register</button>`;
-}
-
-async function register() {
-  email = document.getElementById("regEmail").value;
-  const password = document.getElementById("regPass").value;
-  const res = await fetch(API+"/register", {
-    method:"POST", headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({email,password})
-  });
-  const data = await res.json();
-  document.getElementById("regMsg").innerText = JSON.stringify(data);
-  showPage("login");
-}
-
-async function login() {
-  email = document.getElementById("logEmail").value;
-  const password = document.getElementById("logPass").value;
-  const res = await fetch(API+"/login", {
-    method:"POST", headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({email,password})
-  });
-  const data = await res.json();
-  if(data.token){
-    token=data.token;
-    localStorage.setItem("token", token);
-    localStorage.setItem("email", email);
-    updateNav();
-    document.getElementById("status").innerText = `Bienvenue ${email} 🐨🔥⚡️`;
-    showPage("dashboard");
-  }
-  document.getElementById("loginMsg").innerText = JSON.stringify(data);
-}
-
-async function push() {
-  const name = document.getElementById("pkgName").value;
-  const file = document.getElementById("pkgFile").files[0];
-  const fd = new FormData();
-  fd.append("name", name);
-  fd.append("file", file);
-  const res = await fetch(API+"/push", {
-    method:"POST", headers:{Authorization:`Bearer ${token}`}, body:fd
-  });
-  const data = await res.json();
-  document.getElementById("pushMsg").innerText = JSON.stringify(data);
-}
-
-async function list() {
-  const res = await fetch(API+"/list");
-  const data = await res.json();
-  const ul = document.getElementById("pkgList");
-  ul.innerHTML = "";
-  data.packages.forEach(p=>{
-    ul.innerHTML += `<li class="flex gap-2">${p}
-      <button class="px-4 py-2 border border-[#e46b10]" onclick="pull('${p}')">Pull</button>
-      <button class="px-4 py-2 border border-[#e46b10]" onclick="del('${p}')">Delete</button>
-    </li>`;
-  });
-}
-async function pull(name) {
-  const res = await fetch(API+"/pull/"+name);
-  if(res.ok){
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = name+".pkg";
-    a.click();
-    URL.revokeObjectURL(url);
-  } else {
-    alert("Erreur lors du téléchargement: " + res.statusText);
-  }
-}
-
-async function del(name) {
-  const res = await fetch(API+"/delete/"+name, {
-    method:"DELETE",
-    headers:{Authorization:`Bearer ${token}`}
-  });
-  const data = await res.json();
-  alert(JSON.stringify(data));
-  list();
-}
-
-function renderMarkdown() {
-  const input = document.getElementById("mdInput").value;
-  const output = document.getElementById("mdOutput");
-  output.innerHTML = marked.parse(input);
-}
-
-function logout(){
-  token=null; email=null;
-  localStorage.removeItem("token");
-  localStorage.removeItem("email");
-  updateNav();
-  showPage("login");
-}
-
-// Initialisation
-updateNav();
-showPage("dashboard");
-</script>
-
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        
+        // URL de base de l'API
+        const API_BASE_URL = 'https://gophub.onrender.com';
+        
+        // Composant principal de l'application
+        function App() {
+            const [currentView, setCurrentView] = useState('home');
+            const [token, setToken] = useState(localStorage.getItem('gophub_token') || '');
+            const [packages, setPackages] = useState([]);
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+            const [success, setSuccess] = useState('');
+            
+            // Effet pour récupérer la liste des packages au chargement
+            useEffect(() => {
+                if (currentView === 'home') {
+                    fetchPackages();
+                }
+            }, [currentView]);
+            
+            // Fonction pour récupérer la liste des packages
+            const fetchPackages = async () => {
+                setLoading(true);
+                try {
+                    const response = await fetch(`${API_BASE_URL}/list`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        setPackages(data.packages || []);
+                    } else {
+                        setError('Erreur lors du chargement des packages');
+                    }
+                } catch (err) {
+                    setError('Erreur de connexion au serveur');
+                } finally {
+                    setLoading(false);
+                }
+            };
+            
+            // Fonction pour gérer la déconnexion
+            const handleLogout = () => {
+                setToken('');
+                localStorage.removeItem('gophub_token');
+                setCurrentView('home');
+            };
+            
+            // Fonction pour afficher les messages d'erreur/succès
+            const showMessage = (message, type = 'error') => {
+                if (type === 'error') {
+                    setError(message);
+                    setSuccess('');
+                } else {
+                    setSuccess(message);
+                    setError('');
+                }
+                
+                setTimeout(() => {
+                    setError('');
+                    setSuccess('');
+                }, 5000);
+            };
+            
+            return (
+                <div>
+                    {/* Navigation */}
+                    <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+                        <div className="container">
+                            <a className="navbar-brand" href="#" onClick={() => setCurrentView('home')}>
+                                <i className="fas fa-rocket me-2"></i>gopHub 🚀
+                            </a>
+                            
+                            <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                                <span className="navbar-toggler-icon"></span>
+                            </button>
+                            
+                            <div className="collapse navbar-collapse" id="navbarNav">
+                                <ul className="navbar-nav me-auto">
+                                    <li className="nav-item">
+                                        <a className={`nav-link ${currentView === 'home' ? 'active' : ''}`} 
+                                           href="#" onClick={() => setCurrentView('home')}>
+                                            <i className="fas fa-home me-1"></i> Accueil
+                                        </a>
+                                    </li>
+                                    {token && (
+                                        <li className="nav-item">
+                                            <a className={`nav-link ${currentView === 'push' ? 'active' : ''}`} 
+                                               href="#" onClick={() => setCurrentView('push')}>
+                                                <i className="fas fa-upload me-1"></i> Publier
+                                            </a>
+                                        </li>
+                                    )}
+                                </ul>
+                                
+                                <ul className="navbar-nav">
+                                    {token ? (
+                                        <li className="nav-item">
+                                            <button className="btn btn-outline-primary" onClick={handleLogout}>
+                                                <i className="fas fa-sign-out-alt me-1"></i> Déconnexion
+                                            </button>
+                                        </li>
+                                    ) : (
+                                        <>
+                                            <li className="nav-item me-2">
+                                                <button className="btn btn-outline-primary" onClick={() => setCurrentView('login')}>
+                                                    <i className="fas fa-sign-in-alt me-1"></i> Connexion
+                                                </button>
+                                            </li>
+                                            <li className="nav-item">
+                                                <button className="btn btn-primary" onClick={() => setCurrentView('register')}>
+                                                    <i className="fas fa-user-plus me-1"></i> Inscription
+                                                </button>
+                                            </li>
+                                        </>
+                                    )}
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+                    
+                    {/* Messages d'alerte */}
+                    <div className="container mt-3">
+                        {error && (
+                            <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i className="fas fa-exclamation-triangle me-2"></i> {error}
+                                <button type="button" className="btn-close" onClick={() => setError('')}></button>
+                            </div>
+                        )}
+                        
+                        {success && (
+                            <div className="alert alert-success alert-dismissible fade show" role="alert">
+                                <i className="fas fa-check-circle me-2"></i> {success}
+                                <button type="button" className="btn-close" onClick={() => setSuccess('')}></button>
+                            </div>
+                        )}
+                    </div>
+                    
+                    {/* Contenu principal */}
+                    <main>
+                        {currentView === 'home' && (
+                            <HomeView 
+                                packages={packages} 
+                                loading={loading} 
+                                token={token}
+                                showMessage={showMessage}
+                                setCurrentView={setCurrentView}
+                            />
+                        )}
+                        
+                        {currentView === 'register' && (
+                            <RegisterView 
+                                setCurrentView={setCurrentView}
+                                setToken={setToken}
+                                showMessage={showMessage}
+                            />
+                        )}
+                        
+                        {currentView === 'login' && (
+                            <LoginView 
+                                setCurrentView={setCurrentView}
+                                setToken={setToken}
+                                showMessage={showMessage}
+                            />
+                        )}
+                        
+                        {currentView === 'push' && (
+                            <PushView 
+                                token={token}
+                                showMessage={showMessage}
+                                setCurrentView={setCurrentView}
+                            />
+                        )}
+                    </main>
+                    
+                    {/* Pied de page */}
+                    <footer>
+                        <div className="container text-center">
+                            <p>gopHub 🚀 - Votre gestionnaire de packages Go</p>
+                            <p className="mb-0">Développé avec <i className="fas fa-heart text-danger"></i> pour la communauté Go</p>
+                        </div>
+                    </footer>
+                </div>
+            );
+        }
+        
+        // Vue d'accueil
+        function HomeView({ packages, loading, token, showMessage, setCurrentView }) {
+            const [selectedPackage, setSelectedPackage] = useState(null);
+            const [readmeContent, setReadmeContent] = useState('');
+            const [showReadme, setShowReadme] = useState(false);
+            
+            // Fonction pour télécharger un fichier
+            const downloadFile = async (packageName, fileName) => {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/pull/${packageName}/${fileName}`);
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                    } else {
+                        showMessage('Erreur lors du téléchargement');
+                    }
+                } catch (err) {
+                    showMessage('Erreur de connexion');
+                }
+            };
+            
+            // Fonction pour afficher le README
+            const viewReadme = async (packageName) => {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/readme/${packageName}`);
+                    if (response.ok) {
+                        const content = await response.text();
+                        setReadmeContent(content);
+                        setSelectedPackage(packageName);
+                        setShowReadme(true);
+                    } else {
+                        showMessage('README non trouvé pour ce package');
+                    }
+                } catch (err) {
+                    showMessage('Erreur de connexion');
+                }
+            };
+            
+            // Calcul des statistiques
+            const totalPackages = packages.length;
+            const totalDownloads = packages.reduce((sum, pkg) => sum + (pkg.downloads || 0), 0);
+            const popularPackage = packages.length > 0 ? 
+                packages.reduce((prev, current) => (prev.downloads > current.downloads) ? prev : current) : 
+                null;
+            
+            return (
+                <div>
+                    {/* Section hero */}
+                    <section className="hero-section">
+                        <div className="container text-center">
+                            <h1 className="display-4 fw-bold mb-3">gopHub 🚀</h1>
+                            <p className="lead mb-4">Votre gestionnaire de packages Go personnel</p>
+                            {!token && (
+                                <div>
+                                    <button className="btn btn-light btn-lg me-2" onClick={() => setCurrentView('register')}>
+                                        <i className="fas fa-user-plus me-2"></i> Créer un compte
+                                    </button>
+                                    <button className="btn btn-outline-light btn-lg" onClick={() => setCurrentView('login')}>
+                                        <i className="fas fa-sign-in-alt me-2"></i> Se connecter
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </section>
+                    
+                    <div className="container">
+                        {/* Statistiques */}
+                        <div className="row mb-4">
+                            <div className="col-md-4">
+                                <div className="stats-card">
+                                    <div className="stats-number">{totalPackages}</div>
+                                    <div className="text-muted">Packages</div>
+                                </div>
+                            </div>
+                            <div className="col-md-4">
+                                <div className="stats-card">
+                                    <div className="stats-number">{totalDownloads}</div>
+                                    <div className="text-muted">Téléchargements</div>
+                                </div>
+                            </div>
+                            <div className="col-md-4">
+                                <div className="stats-card">
+                                    <div className="stats-number">
+                                        {popularPackage ? popularPackage.downloads : 0}
+                                    </div>
+                                    <div className="text-muted">
+                                        {popularPackage ? `Téléchargements (${popularPackage.name})` : 'Package populaire'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Liste des packages */}
+                        <div className="d-flex justify-content-between align-items-center mb-4">
+                            <h2>Packages disponibles</h2>
+                            {token && (
+                                <button className="btn btn-primary" onClick={() => setCurrentView('push')}>
+                                    <i className="fas fa-plus me-1"></i> Nouveau Package
+                                </button>
+                            )}
+                        </div>
+                        
+                        {loading ? (
+                            <div className="text-center py-5">
+                                <div className="loading-spinner"></div>
+                                <p className="mt-3">Chargement des packages...</p>
+                            </div>
+                        ) : packages.length === 0 ? (
+                            <div className="text-center py-5 bg-light rounded">
+                                <i className="fas fa-box-open fa-3x text-muted mb-3"></i>
+                                <h4 className="text-muted">Aucun package disponible</h4>
+                                <p className="text-muted">Soyez le premier à publier un package !</p>
+                                {token ? (
+                                    <button className="btn btn-primary" onClick={() => setCurrentView('push')}>
+                                        <i className="fas fa-upload me-1"></i> Publier un package
+                                    </button>
+                                ) : (
+                                    <button className="btn btn-primary" onClick={() => setCurrentView('register')}>
+                                        <i className="fas fa-user-plus me-1"></i> Créer un compte
+                                    </button>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="row">
+                                {packages.map(pkg => (
+                                    <div key={pkg.name} className="col-lg-6">
+                                        <div className="package-card shadow-sm">
+                                            <div className="package-header d-flex justify-content-between align-items-center">
+                                                <h5 className="mb-0">{pkg.name}</h5>
+                                                <span className="download-count">
+                                                    <i className="fas fa-download me-1"></i> {pkg.downloads || 0}
+                                                </span>
+                                            </div>
+                                            <div className="card-body">
+                                                <p className="card-text">{pkg.description || 'Aucune description'}</p>
+                                                <div className="d-flex justify-content-between">
+                                                    <button 
+                                                        className="btn btn-outline-primary btn-sm"
+                                                        onClick={() => viewReadme(pkg.name)}
+                                                    >
+                                                        <i className="fas fa-book me-1"></i> README
+                                                    </button>
+                                                    <button 
+                                                        className="btn btn-primary btn-sm"
+                                                        onClick={() => downloadFile(pkg.name, 'main.go')}
+                                                    >
+                                                        <i className="fas fa-download me-1"></i> Télécharger
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    
+                    {/* Modal README */}
+                    {showReadme && (
+                        <div className="modal fade show d-block" style={{backgroundColor: 'rgba(0,0,0,0.5)'}}>
+                            <div className="modal-dialog modal-lg">
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <h5 className="modal-title">README - {selectedPackage}</h5>
+                                        <button type="button" className="btn-close" onClick={() => setShowReadme(false)}></button>
+                                    </div>
+                                    <div className="modal-body">
+                                        <div className="readme-content">
+                                            {readmeContent || 'Aucun contenu README disponible.'}
+                                        </div>
+                                    </div>
+                                    <div className="modal-footer">
+                                        <button type="button" className="btn btn-secondary" onClick={() => setShowReadme(false)}>
+                                            Fermer
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+        
+        // Vue d'inscription
+        function RegisterView({ setCurrentView, setToken, showMessage }) {
+            const [formData, setFormData] = useState({
+                email: '',
+                password: ''
+            });
+            const [loading, setLoading] = useState(false);
+            
+            const handleChange = (e) => {
+                setFormData({
+                    ...formData,
+                    [e.target.name]: e.target.value
+                });
+            };
+            
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                
+                try {
+                    const response = await fetch(`${API_BASE_URL}/register`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        showMessage('Compte créé avec succès! Vous pouvez maintenant vous connecter.', 'success');
+                        setCurrentView('login');
+                    } else {
+                        showMessage(data.detail || 'Erreur lors de la création du compte');
+                    }
+                } catch (err) {
+                    showMessage('Erreur de connexion au serveur');
+                } finally {
+                    setLoading(false);
+                }
+            };
+            
+            return (
+                <div className="auth-container">
+                    <div className="text-center mb-4">
+                        <h2><i className="fas fa-user-plus me-2"></i> Créer un compte</h2>
+                        <p className="text-muted">Rejoignez gopHub pour publier vos packages</p>
+                    </div>
+                    
+                    <form onSubmit={handleSubmit}>
+                        <div className="mb-3">
+                            <label htmlFor="email" className="form-label">Email</label>
+                            <input 
+                                type="email" 
+                                className="form-control" 
+                                id="email" 
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        
+                        <div className="mb-4">
+                            <label htmlFor="password" className="form-label">Mot de passe</label>
+                            <input 
+                                type="password" 
+                                className="form-control" 
+                                id="password" 
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        
+                        <button 
+                            type="submit" 
+                            className="btn btn-primary w-100 py-2"
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <>
+                                    <span className="loading-spinner me-2"></span>
+                                    Création du compte...
+                                </>
+                            ) : (
+                                'Créer mon compte'
+                            )}
+                        </button>
+                    </form>
+                    
+                    <div className="text-center mt-3">
+                        <p>Déjà un compte? 
+                            <a href="#" className="ms-1" onClick={() => setCurrentView('login')}>
+                                Se connecter
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Vue de connexion
+        function LoginView({ setCurrentView, setToken, showMessage }) {
+            const [formData, setFormData] = useState({
+                email: '',
+                password: ''
+            });
+            const [loading, setLoading] = useState(false);
+            
+            const handleChange = (e) => {
+                setFormData({
+                    ...formData,
+                    [e.target.name]: e.target.value
+                });
+            };
+            
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                
+                try {
+                    const response = await fetch(`${API_BASE_URL}/login`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        setToken(data.token);
+                        localStorage.setItem('gophub_token', data.token);
+                        showMessage('Connexion réussie!', 'success');
+                        setCurrentView('home');
+                    } else {
+                        showMessage(data.detail || 'Erreur de connexion');
+                    }
+                } catch (err) {
+                    showMessage('Erreur de connexion au serveur');
+                } finally {
+                    setLoading(false);
+                }
+            };
+            
+            return (
+                <div className="auth-container">
+                    <div className="text-center mb-4">
+                        <h2><i className="fas fa-sign-in-alt me-2"></i> Connexion</h2>
+                        <p className="text-muted">Accédez à votre compte gopHub</p>
+                    </div>
+                    
+                    <form onSubmit={handleSubmit}>
+                        <div className="mb-3">
+                            <label htmlFor="email" className="form-label">Email</label>
+                            <input 
+                                type="email" 
+                                className="form-control" 
+                                id="email" 
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        
+                        <div className="mb-4">
+                            <label htmlFor="password" className="form-label">Mot de passe</label>
+                            <input 
+                                type="password" 
+                                className="form-control" 
+                                id="password" 
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                        
+                        <button 
+                            type="submit" 
+                            className="btn btn-primary w-100 py-2"
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <>
+                                    <span className="loading-spinner me-2"></span>
+                                    Connexion...
+                                </>
+                            ) : (
+                                'Se connecter'
+                            )}
+                        </button>
+                    </form>
+                    
+                    <div className="text-center mt-3">
+                        <p>Pas encore de compte? 
+                            <a href="#" className="ms-1" onClick={() => setCurrentView('register')}>
+                                S'inscrire
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Vue de publication de package
+        function PushView({ token, showMessage, setCurrentView }) {
+            const [formData, setFormData] = useState({
+                name: '',
+                version: 'latest'
+            });
+            const [files, setFiles] = useState([]);
+            const [loading, setLoading] = useState(false);
+            const fileInputRef = useRef(null);
+            
+            const handleChange = (e) => {
+                setFormData({
+                    ...formData,
+                    [e.target.name]: e.target.value
+                });
+            };
+            
+            const handleFileChange = (e) => {
+                if (e.target.files.length > 0) {
+                    const newFiles = Array.from(e.target.files);
+                    setFiles([...files, ...newFiles]);
+                }
+            };
+            
+            const removeFile = (index) => {
+                const newFiles = [...files];
+                newFiles.splice(index, 1);
+                setFiles(newFiles);
+            };
+            
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                
+                if (files.length === 0) {
+                    showMessage('Veuillez sélectionner au moins un fichier');
+                    return;
+                }
+                
+                setLoading(true);
+                
+                try {
+                    const formDataToSend = new FormData();
+                    formDataToSend.append('name', formData.name);
+                    formDataToSend.append('version', formData.version);
+                    
+                    files.forEach(file => {
+                        formDataToSend.append('files', file);
+                    });
+                    
+                    const response = await fetch(`${API_BASE_URL}/push`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: formDataToSend
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        showMessage(`Package "${formData.name}" publié avec succès!`, 'success');
+                        setFormData({ name: '', version: 'latest' });
+                        setFiles([]);
+                        setCurrentView('home');
+                    } else {
+                        showMessage(data.detail || 'Erreur lors de la publication');
+                    }
+                } catch (err) {
+                    showMessage('Erreur de connexion au serveur');
+                } finally {
+                    setLoading(false);
+                }
+            };
+            
+            return (
+                <div className="container">
+                    <div className="row justify-content-center">
+                        <div className="col-lg-8">
+                            <div className="card shadow-sm">
+                                <div className="card-header bg-primary text-white">
+                                    <h4 className="mb-0"><i className="fas fa-upload me-2"></i> Publier un package</h4>
+                                </div>
+                                <div className="card-body p-4">
+                                    <form onSubmit={handleSubmit}>
+                                        <div className="mb-3">
+                                            <label htmlFor="name" className="form-label">Nom du package</label>
+                                            <input 
+                                                type="text" 
+                                                className="form-control" 
+                                                id="name" 
+                                                name="name"
+                                                value={formData.name}
+                                                onChange={handleChange}
+                                                placeholder="ex: mon-package"
+                                                required
+                                            />
+                                        </div>
+                                        
+                                        <div className="mb-4">
+                                            <label htmlFor="version" className="form-label">Version</label>
+                                            <input 
+                                                type="text" 
+                                                className="form-control" 
+                                                id="version" 
+                                                name="version"
+                                                value={formData.version}
+                                                onChange={handleChange}
+                                                placeholder="ex: 1.0.0"
+                                            />
+                                        </div>
+                                        
+                                        <div className="mb-4">
+                                            <label className="form-label">Fichiers du package</label>
+                                            <div 
+                                                className="file-upload-area"
+                                                onClick={() => fileInputRef.current.click()}
+                                            >
+                                                <i className="fas fa-cloud-upload-alt fa-2x text-muted mb-3"></i>
+                                                <p className="mb-1">Cliquez pour sélectionner des fichiers ou glissez-déposez</p>
+                                                <p className="text-muted small">Fichiers Go, README.md, etc.</p>
+                                            </div>
+                                            
+                                            <input 
+                                                type="file" 
+                                                ref={fileInputRef}
+                                                multiple 
+                                                style={{display: 'none'}}
+                                                onChange={handleFileChange}
+                                            />
+                                            
+                                            {files.length > 0 && (
+                                                <div className="file-list">
+                                                    <h6 className="mb-2">Fichiers sélectionnés:</h6>
+                                                    {files.map((file, index) => (
+                                                        <div key={index} className="file-item">
+                                                            <span>
+                                                                <i className="fas fa-file me-2"></i> {file.name}
+                                                            </span>
+                                                            <button 
+                                                                type="button" 
+                                                                className="btn btn-sm btn-outline-danger"
+                                                                onClick={() => removeFile(index)}
+                                                            >
+                                                                <i className="fas fa-times"></i>
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                        
+                                        <div className="d-grid">
+                                            <button 
+                                                type="submit" 
+                                                className="btn btn-primary py-2"
+                                                disabled={loading}
+                                            >
+                                                {loading ? (
+                                                    <>
+                                                        <span className="loading-spinner me-2"></span>
+                                                        Publication en cours...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <i className="fas fa-rocket me-2"></i> Publier le package
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+        
+        // Rendu de l'application
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
